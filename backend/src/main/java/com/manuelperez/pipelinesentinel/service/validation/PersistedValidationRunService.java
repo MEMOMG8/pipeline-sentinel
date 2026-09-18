@@ -13,7 +13,6 @@ import com.manuelperez.pipelinesentinel.persistence.validation.repository.DataSo
 import com.manuelperez.pipelinesentinel.persistence.validation.repository.QuarantinedRecordRepository;
 import com.manuelperez.pipelinesentinel.persistence.validation.repository.ValidationIssueRepository;
 import com.manuelperez.pipelinesentinel.persistence.validation.repository.ValidationRunRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@ConditionalOnBean(ValidationRunRepository.class)
 public class PersistedValidationRunService implements ValidationRunAuditService {
 
     private final ValidationPreviewService validationPreviewService;

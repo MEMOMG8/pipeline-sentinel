@@ -6,6 +6,7 @@ import com.manuelperez.pipelinesentinel.persistence.validation.repository.DataSo
 import com.manuelperez.pipelinesentinel.persistence.validation.repository.QuarantinedRecordRepository;
 import com.manuelperez.pipelinesentinel.persistence.validation.repository.ValidationIssueRepository;
 import com.manuelperez.pipelinesentinel.persistence.validation.repository.ValidationRunRepository;
+import com.manuelperez.pipelinesentinel.service.validation.ValidationRunAuditService;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -51,7 +52,7 @@ class ValidationRunPersistenceIntegrationTest {
             """;
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:16-alpine");
 
     @DynamicPropertySource
     static void postgresProperties(DynamicPropertyRegistry registry) {
@@ -81,8 +82,12 @@ class ValidationRunPersistenceIntegrationTest {
     @Autowired
     private QuarantinedRecordRepository quarantinedRecordRepository;
 
+    @Autowired
+    private ValidationRunAuditService validationRunAuditService;
+
     @Test
     void flywayMigrationAppliesAndSeededDataSourceExists() {
+        assertThat(validationRunAuditService).isNotNull();
         assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("1");
         assertThat(dataSourceRepository.findByCodeAndActiveTrue("transaction-events"))
                 .hasValueSatisfying(dataSource -> {
