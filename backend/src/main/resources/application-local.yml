@@ -1,6 +1,18 @@
 server:
   port: 8080
 
+spring:
+  datasource:
+    url: ${PIPELINE_SENTINEL_DB_URL}
+    username: ${PIPELINE_SENTINEL_DB_USERNAME}
+    password: ${PIPELINE_SENTINEL_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
 logging:
   level:
     com.manuelperez.pipelinesentinel: INFO

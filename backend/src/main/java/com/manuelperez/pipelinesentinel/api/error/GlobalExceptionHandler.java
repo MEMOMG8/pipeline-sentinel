@@ -48,6 +48,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(toErrorResponse(status, "Invalid multipart request", request));
     }
 
+    @ExceptionHandler(ApiNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNotFound(
+            ApiNotFoundException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(status).body(toErrorResponse(status, exception.getMessage(), request));
+    }
+
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNoHandlerFound(
             NoHandlerFoundException exception,

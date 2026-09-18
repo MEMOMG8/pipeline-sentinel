@@ -1,6 +1,7 @@
 package com.manuelperez.pipelinesentinel.service.validation;
 
 import com.manuelperez.pipelinesentinel.api.error.ApiBadRequestException;
+import com.manuelperez.pipelinesentinel.domain.validation.InvalidValidationRecord;
 import com.manuelperez.pipelinesentinel.domain.validation.IssueCategory;
 import com.manuelperez.pipelinesentinel.domain.validation.IssueSeverity;
 import com.manuelperez.pipelinesentinel.domain.validation.ValidationCounts;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -106,6 +108,7 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
         List<ValidationIssue> issues = new ArrayList<>();
         Set<String> transactionIds = new HashSet<>();
         Set<Long> invalidRecordNumbers = new HashSet<>();
+        Map<Integer, InvalidValidationRecord> invalidRecords = new LinkedHashMap<>();
 
         for (int index = 1; index < records.size(); index++) {
             CSVRecord record = records.get(index);
@@ -118,6 +121,10 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
             validateTransactionIdUniqueness(record, headerValidation.headerIndexes(), transactionIds, issues);
             if (issues.size() > issueCountBeforeRecord) {
                 invalidRecordNumbers.add(record.getRecordNumber());
+                invalidRecords.put(rowNumber(record), new InvalidValidationRecord(
+                        rowNumber(record),
+                        rawRecord(record, headerValidation.headerNames())
+                ));
             }
         }
 
@@ -126,7 +133,7 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
         if (issues.isEmpty()) {
             return passed(totalRows, validRows);
         }
-        return rejected(totalRows, invalidRows, issues);
+        return rejected(totalRows, invalidRows, issues, new ArrayList<>(invalidRecords.values()));
     }
 
     private HeaderValidation validateHeaders(CSVRecord headerRecord) {
@@ -161,7 +168,11 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
                 ));
             }
         }
-        return new HeaderValidation(headerIndexes, issues);
+        List<String> headerNames = new ArrayList<>();
+        for (int index = 0; index < headerRecord.size(); index++) {
+            headerNames.add(headerRecord.get(index));
+        }
+        return new HeaderValidation(headerIndexes, headerNames, issues);
     }
 
     private void validateRequiredFields(
@@ -321,6 +332,15 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
         return Math.toIntExact(record.getRecordNumber());
     }
 
+    private Map<String, String> rawRecord(CSVRecord record, List<String> headerNames) {
+        Map<String, String> rawRecord = new LinkedHashMap<>();
+        for (int index = 0; index < headerNames.size(); index++) {
+            String value = index < record.size() ? record.get(index) : "";
+            rawRecord.put(headerNames.get(index), value);
+        }
+        return rawRecord;
+    }
+
     private ValidationPreviewResult passed(int totalRows, int validRows) {
         return new ValidationPreviewResult(
                 DATA_SOURCE_CODE,
@@ -329,11 +349,21 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
                 ValidationOutcome.PASSED,
                 null,
                 new ValidationCounts(totalRows, validRows, 0, 0),
+                List.of(),
                 List.of()
         );
     }
 
     private ValidationPreviewResult rejected(int totalRows, int invalidRows, List<ValidationIssue> issues) {
+        return rejected(totalRows, invalidRows, issues, List.of());
+    }
+
+    private ValidationPreviewResult rejected(
+            int totalRows,
+            int invalidRows,
+            List<ValidationIssue> issues,
+            List<InvalidValidationRecord> invalidRecords
+    ) {
         int validRows = Math.max(totalRows - invalidRows, 0);
         return new ValidationPreviewResult(
                 DATA_SOURCE_CODE,
@@ -342,7 +372,8 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
                 ValidationOutcome.REJECTED,
                 maxSeverity(issues),
                 new ValidationCounts(totalRows, validRows, invalidRows, issues.size()),
-                List.copyOf(issues)
+                List.copyOf(issues),
+                List.copyOf(invalidRecords)
         );
     }
 
@@ -369,6 +400,7 @@ public class TransactionEventsValidationPreviewService implements ValidationPrev
 
     private record HeaderValidation(
             Map<String, Integer> headerIndexes,
+            List<String> headerNames,
             List<ValidationIssue> issues
     ) {
     }

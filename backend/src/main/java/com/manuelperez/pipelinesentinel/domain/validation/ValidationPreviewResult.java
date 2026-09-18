@@ -9,6 +9,7 @@ public record ValidationPreviewResult(
         ValidationOutcome outcome,
         IssueSeverity maxSeverity,
         ValidationCounts counts,
-        List<ValidationIssue> issues
+        List<ValidationIssue> issues,
+        List<InvalidValidationRecord> invalidRecords
 ) {
 }
