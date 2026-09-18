@@ -1,0 +1,39 @@
+# Java / Maven
+target/
+backend/target/
+backend/.mvn/wrapper/apache-maven-*/
+backend/.mvn/wrapper/*.zip
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Node / future frontend
+node_modules/
+.next/
+out/
+dist/
+build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Future local data artifacts
+data/
+local-data/
+*.db
+*.sqlite
+*.sqlite3
