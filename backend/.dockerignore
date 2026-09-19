@@ -1,0 +1,8 @@
+target/
+.mvn/wrapper/apache-maven-*/
+.mvn/wrapper/*.zip
+.git/
+.gitignore
+.env
+.env.*
+*.log
