@@ -1,8 +1,10 @@
 # Pipeline Sentinel
 
+[![CI](https://github.com/MEMOMG8/pipeline-sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/MEMOMG8/pipeline-sentinel/actions/workflows/ci.yml)
+
 Pipeline Sentinel is a local data-quality and incident-triage demo. It validates uploaded batch CSV data before downstream systems consume it, stores an audit trail of validation runs, and lets an operator inspect issues and quarantined records in a small dashboard.
 
-Current status: this is a local Docker demo. It is not cloud-deployed and does not include authentication, queues, object storage, background workers, observability, CI/CD, AI features, or production secrets management.
+Current status: this is a local Docker demo. It is not cloud-deployed and does not include authentication, queues, object storage, background workers, observability, deployment automation, AI features, or production secrets management.
 
 ## Architecture
 
@@ -213,5 +215,6 @@ npm run build
 - Milestone 3: PostgreSQL/Flyway audit persistence for completed validation runs.
 - Milestone 4: local Next.js dashboard for upload, recent runs, run detail, issues, and quarantined records.
 - Milestone 5: reproducible local Docker Compose demo and recruiter-ready documentation.
+- Milestone 6: GitHub Actions continuous integration for backend and frontend checks.
 
 Explicit current limitations: no whole-file disk quarantine, no freshness validation, no frontend auth, no cloud deployment, no Docker Compose production hardening, no queues, no notifications, no charts, no observability, and no AI features.
