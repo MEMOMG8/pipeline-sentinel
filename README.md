@@ -9,7 +9,7 @@ This milestone establishes a clean monorepo starting point and a minimal Spring 
 Current structure:
 
 - `backend/` - Spring Boot 3 API service using Java 21 and Maven.
-- `frontend/` - planned for a later milestone; not scaffolded yet.
+- `frontend/` - Next.js App Router dashboard using TypeScript and Tailwind CSS.
 - `docs/` - planned for later project documentation.
 - `infrastructure/` - planned for later deployment and cloud work.
 
@@ -30,6 +30,8 @@ Example response:
 
 - Java 21
 - Maven 3.9.x, or the included `backend/mvnw.cmd` / `backend/mvnw` wrapper scripts
+- Node.js 20+
+- npm 11+
 
 The wrapper scripts download Maven into `backend/.mvn/wrapper/` on first use.
 
@@ -170,3 +172,79 @@ curl.exe "http://localhost:8080/api/v1/validation-runs/{runId}/quarantined-recor
 ```
 
 Milestone 3 still does not include frontend scaffolding, Docker Compose, whole-file disk quarantine, stale-data validation, data-source CRUD, AWS/cloud deployment, authentication, queues, notifications, AI features, CI, or background workers.
+
+## Milestone 4
+
+Milestone 4 adds a local-only Next.js dashboard for submitting CSV validation runs and reviewing persisted audit results.
+
+Frontend behavior:
+
+- `GET /` shows the Pipeline Sentinel dashboard.
+- The upload card submits CSV files to `POST /api/v1/validation-runs` with `dataSourceCode=transaction-events`.
+- Successful uploads navigate to `/runs/{runId}`.
+- Recent runs are loaded from `GET /api/v1/validation-runs`.
+- Run details load the persisted run, issues, and quarantined records from the existing backend endpoints.
+- Raw invalid record values are displayed as text/JSON in the browser; the frontend does not use HTML injection for quarantined data.
+
+Backend CORS:
+
+- Local frontend origin is controlled by `PIPELINE_SENTINEL_CORS_ALLOWED_ORIGINS`.
+- The default local origin is `http://localhost:3000`.
+- The backend does not use wildcard CORS origins.
+
+Frontend environment:
+
+Create `frontend/.env.local` for local development:
+
+```powershell
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+```
+
+Run PostgreSQL locally without Docker Compose:
+
+```powershell
+docker run --rm --name pipeline-sentinel-postgres `
+  -e POSTGRES_DB=pipeline_sentinel `
+  -e POSTGRES_USER=pipeline_sentinel `
+  -e POSTGRES_PASSWORD=change-me `
+  -p 5432:5432 `
+  postgres:16-alpine
+```
+
+In a separate PowerShell session, run the backend:
+
+```powershell
+cd backend
+$env:PIPELINE_SENTINEL_DB_URL = "jdbc:postgresql://localhost:5432/pipeline_sentinel"
+$env:PIPELINE_SENTINEL_DB_USERNAME = "pipeline_sentinel"
+$env:PIPELINE_SENTINEL_DB_PASSWORD = "change-me"
+$env:PIPELINE_SENTINEL_CORS_ALLOWED_ORIGINS = "http://localhost:3000"
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+```
+
+Run the frontend:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Then open `http://localhost:3000`.
+
+Browser demo flow:
+
+1. Upload a synthetic `transaction-events` CSV.
+2. Open the created run detail page.
+3. Inspect the run summary, issues, and quarantined records.
+
+Frontend quality commands:
+
+```powershell
+cd frontend
+npm run test
+npm run lint
+npm run build
+```
+
+Milestone 4 is local-only and is not deployed. It still does not include Docker Compose, deployment, CI, S3, SQS, workers, Slack, observability, freshness validation, whole-file quarantine, or AI features.

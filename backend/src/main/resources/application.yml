@@ -11,3 +11,7 @@ server:
   error:
     whitelabel:
       enabled: false
+
+pipeline-sentinel:
+  cors:
+    allowed-origins: ${PIPELINE_SENTINEL_CORS_ALLOWED_ORIGINS:http://localhost:3000}
