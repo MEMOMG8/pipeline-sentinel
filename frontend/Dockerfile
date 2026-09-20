@@ -17,10 +17,11 @@ RUN npm run build
 FROM node:20-alpine AS runner
 
 WORKDIR /app
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8081
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
-ENV NEXT_PUBLIC_API_BASE_URL=http://localhost:8081
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 
 RUN addgroup -S app && adduser -S app -G app
 

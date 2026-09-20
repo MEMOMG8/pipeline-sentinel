@@ -12,8 +12,13 @@ Current status: this is a local Docker demo. It is not cloud-deployed and does n
 - `backend/` - Java 21 / Spring Boot 3.3.5 API using Maven, Spring Web, Bean Validation, Spring Data JPA, Flyway, and PostgreSQL.
 - `examples/` - synthetic CSV files for local demos.
 - `compose.yaml` - local three-service demo stack: PostgreSQL, backend API, and frontend.
+- `compose.aws.yaml` - AWS Lightsail single-instance deployment configuration with Caddy as the public reverse proxy.
 
 The persisted API validates the CSV with deterministic in-memory rules, saves completed validation runs to PostgreSQL, stores row-level issues, and stores one JSONB quarantined record per invalid row. The preview endpoint still returns an in-memory result and does not persist anything.
+
+## Deployment
+
+Pipeline Sentinel supports AWS Lightsail single-instance deployment with Docker Compose. See [docs/deployment/aws-lightsail.md](docs/deployment/aws-lightsail.md) for the cost guardrail, server setup, Caddy routing, and operational commands.
 
 ## Quick Demo
 
@@ -216,5 +221,6 @@ npm run build
 - Milestone 4: local Next.js dashboard for upload, recent runs, run detail, issues, and quarantined records.
 - Milestone 5: reproducible local Docker Compose demo and recruiter-ready documentation.
 - Milestone 6: GitHub Actions continuous integration for backend and frontend checks.
+- Milestone 7: AWS Lightsail single-instance deployment readiness with Docker Compose and Caddy.
 
-Explicit current limitations: no whole-file disk quarantine, no freshness validation, no frontend auth, no cloud deployment, no Docker Compose production hardening, no queues, no notifications, no charts, no observability, and no AI features.
+Explicit current limitations: not cloud-deployed yet; no whole-file disk quarantine, no freshness validation, no frontend auth, no automated deployment, no custom-domain TLS, no queues, no notifications, no charts, no observability, and no AI features.
