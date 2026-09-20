@@ -1,4 +1,4 @@
-:80 {
+pipeline.manuelperezgil.com {
   encode zstd gzip
 
   handle /api/* {

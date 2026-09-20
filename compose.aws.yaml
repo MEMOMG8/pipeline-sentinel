@@ -52,8 +52,11 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - pipeline-sentinel-caddy-data:/data
+      - pipeline-sentinel-caddy-config:/config
     depends_on:
       backend:
         condition: service_healthy
@@ -62,3 +65,5 @@ services:
 
 volumes:
   pipeline-sentinel-aws-postgres-data:
+  pipeline-sentinel-caddy-data:
+  pipeline-sentinel-caddy-config:

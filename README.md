@@ -2,9 +2,15 @@
 
 [![CI](https://github.com/MEMOMG8/pipeline-sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/MEMOMG8/pipeline-sentinel/actions/workflows/ci.yml)
 
-Pipeline Sentinel is a local data-quality and incident-triage demo. It validates uploaded batch CSV data before downstream systems consume it, stores an audit trail of validation runs, and lets an operator inspect issues and quarantined records in a small dashboard.
+Pipeline Sentinel is a data-quality and incident-triage demo. It validates uploaded batch CSV data before downstream systems consume it, stores an audit trail of validation runs, and lets an operator inspect issues and quarantined records in a small dashboard.
 
-Current status: this is a local Docker demo. It is not cloud-deployed and does not include authentication, queues, object storage, background workers, observability, deployment automation, AI features, or production secrets management.
+Current status: the project has a local Docker demo and an AWS Lightsail deployment path with custom-domain HTTPS. It does not include authentication, queues, object storage, background workers, observability, deployment automation, AI features, or production secrets management.
+
+## Live Demo
+
+Live demo: [https://pipeline.manuelperezgil.com](https://pipeline.manuelperezgil.com)
+
+The demo is deployed on AWS Lightsail with Docker Compose, Caddy-managed HTTPS, PostgreSQL, GitHub Actions CI, and a persistent validation/audit workflow.
 
 ## Architecture
 
@@ -18,7 +24,7 @@ The persisted API validates the CSV with deterministic in-memory rules, saves co
 
 ## Deployment
 
-Pipeline Sentinel supports AWS Lightsail single-instance deployment with Docker Compose. See [docs/deployment/aws-lightsail.md](docs/deployment/aws-lightsail.md) for the cost guardrail, server setup, Caddy routing, and operational commands.
+Pipeline Sentinel supports AWS Lightsail single-instance deployment with Docker Compose and Caddy. See [docs/deployment/aws-lightsail.md](docs/deployment/aws-lightsail.md) for the cost guardrail, custom-domain HTTPS setup, Caddy routing, and operational commands.
 
 ## Quick Demo
 
@@ -222,5 +228,6 @@ npm run build
 - Milestone 5: reproducible local Docker Compose demo and recruiter-ready documentation.
 - Milestone 6: GitHub Actions continuous integration for backend and frontend checks.
 - Milestone 7: AWS Lightsail single-instance deployment readiness with Docker Compose and Caddy.
+- Milestone 8: custom-domain HTTPS and portfolio polish for the Lightsail deployment.
 
-Explicit current limitations: not cloud-deployed yet; no whole-file disk quarantine, no freshness validation, no frontend auth, no automated deployment, no custom-domain TLS, no queues, no notifications, no charts, no observability, and no AI features.
+Explicit current limitations: no whole-file disk quarantine, no freshness validation, no frontend auth, no automated deployment, no queues, no notifications, no charts, no observability, and no AI features.

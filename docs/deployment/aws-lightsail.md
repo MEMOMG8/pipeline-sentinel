@@ -1,18 +1,18 @@
 # AWS Lightsail Single-Instance Deployment
 
-This guide prepares Pipeline Sentinel for a small AWS Lightsail Ubuntu instance running Docker Compose. It does not create AWS resources, require AWS credentials, or automate deployment.
+This guide prepares Pipeline Sentinel for a small AWS Lightsail Ubuntu instance running Docker Compose behind the custom domain `pipeline.manuelperezgil.com`. It does not create AWS resources, require AWS credentials, or automate deployment.
 
 Target architecture:
 
 ```text
 Internet
--> Caddy on port 80
+-> Caddy on ports 80 and 443
 -> Next.js frontend
 -> Spring Boot backend at /api/*
 -> PostgreSQL private inside the Docker network
 ```
 
-The browser calls the backend through the same public origin, for example `/api/v1/health`. The backend and PostgreSQL containers do not publish public host ports.
+The browser calls the backend through the same public origin, for example `https://pipeline.manuelperezgil.com/api/v1/health`. Caddy manages HTTPS certificates and redirects HTTP to HTTPS. The backend and PostgreSQL containers do not publish public host ports.
 
 ## Cost Guardrail
 
@@ -34,15 +34,21 @@ Create one Lightsail instance:
 - Plan: only a plan that fits your budget in the selected region
 - Networking: attach a static IP
 
+DNS prerequisite:
+
+- In Route 53, `pipeline.manuelperezgil.com` must have an `A` record pointing to the Lightsail static IP.
+- Confirm DNS resolves before expecting Caddy to issue a certificate.
+
 Configure the Lightsail firewall:
 
 - Allow SSH `22` only from your current public IP.
 - Allow HTTP `80` from the internet.
+- Allow HTTPS `443` from the internet.
 - Do not open PostgreSQL `5432`.
 - Do not open backend `8080` or `8081`.
 - Do not open frontend `3000`.
 
-Initial deployment may use plain HTTP on the static IP. HTTPS requires a real domain name and DNS in a later optional step.
+Caddy needs ports `80` and `443` open so it can complete automatic certificate management and serve HTTPS for `pipeline.manuelperezgil.com`.
 
 ## Server Setup
 
@@ -121,7 +127,7 @@ docker compose --env-file .env.aws -f compose.aws.yaml ps
 Check the backend through Caddy:
 
 ```bash
-curl http://YOUR_STATIC_IP/api/v1/health
+curl https://pipeline.manuelperezgil.com/api/v1/health
 ```
 
 Expected health response:
@@ -130,11 +136,19 @@ Expected health response:
 {"service":"pipeline-sentinel","status":"UP"}
 ```
 
-Open the public static IP in a browser:
+Open the live dashboard in a browser:
 
 ```text
-http://YOUR_STATIC_IP
+https://pipeline.manuelperezgil.com
 ```
+
+Confirm HTTP redirects to HTTPS:
+
+```bash
+curl -I http://pipeline.manuelperezgil.com
+```
+
+Expected result: an HTTP redirect to `https://pipeline.manuelperezgil.com`.
 
 Demo flow:
 
@@ -193,7 +207,8 @@ Warning: `down -v` deletes the Docker volume that contains the local PostgreSQL 
 - Single-instance deployment only.
 - No high availability.
 - No automated continuous deployment.
-- IP-only HTTP until a real domain and HTTPS are added.
+- HTTPS depends on the Route 53 `A` record resolving to the Lightsail static IP and ports `80` and `443` being reachable.
 - PostgreSQL runs in a local Docker volume on the instance.
+- Caddy certificates and configuration are stored in Docker named volumes.
 - Backups are the operator's responsibility.
 - No RDS, ECS, EKS, App Runner, Lambda, API Gateway, Terraform, queues, or cloud storage are included.

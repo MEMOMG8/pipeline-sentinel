@@ -10,7 +10,7 @@ export default function DashboardPage() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
       <header className="border-b border-line pb-6">
-        <p className="text-sm font-semibold uppercase text-neutral-500">Local dashboard</p>
+        <p className="text-sm font-semibold uppercase text-neutral-500">Data quality dashboard</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-normal text-ink sm:text-4xl">Pipeline Sentinel</h1>
         <p className="mt-3 max-w-2xl text-base text-neutral-600">
           Validates batch data before downstream systems depend on it.
